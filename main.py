@@ -5,6 +5,19 @@ from dotenv import load_dotenv
 import csv
 import time
 
+import urllib.error
+import urllib.request
+import urllib.parse
+
+def download_image(url, dst_path):
+    try:
+        data = urllib.request.urlopen(url).read()
+        with open(dst_path, mode="wb") as f:
+            f.write(data)
+    except urllib.error.URLError as e:
+        print(e)
+
+
 
 def set_driver():
     load_dotenv('.env')
@@ -33,6 +46,9 @@ def data_extract(driver):
         furigana = furigana_elements[i].text
         genre = genre_elements[i].text.split()[0]
         age = age_elements[i].text
+
+        dst_path = './images/' + image_url.split('/')[-1]
+        download_image(image_url, dst_path)
 
         row.append(image_url)
         row.append(name)
