@@ -8,6 +8,13 @@ verify_ssl = true
 [packages]
 selenium = "*"
 python-dotenv = "*"
+matplotlib = "*"
+numpy = "*"
+tensorflow = "*"
+pandas = "*"
+keras = "*"
+pillow = "*"
+scikit-learn = "*"
 
 [requires]
 python_version = "3.7"
