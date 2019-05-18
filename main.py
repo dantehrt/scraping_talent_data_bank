@@ -1,4 +1,3 @@
-import time
 import os
 from selenium import webdriver
 from dotenv import load_dotenv
@@ -9,6 +8,41 @@ import urllib.error
 import urllib.request
 import urllib.parse
 
+import pandas as pd
+import shutil
+
+
+# results.csvの形式を少し変更
+# 画像ファイル名のカラムを追加
+def pre_processing_csv():
+    df = pd.read_csv('results.csv')
+
+    df_new = df.assign(image_file_name=df.image_url.str.split('/').str[-1])
+    print(df_new)
+    df_new = df_new.sort_values(by=['image_file_name'], ascending=True)
+    print(df_new)
+
+    df_new.to_csv('results2.csv', index=False)
+
+
+# 画像をジャンル毎にフォルダ分け
+def move_images():
+    df = pd.read_csv('results2.csv')
+
+    genres = df['genre'].unique()
+
+    for genre in genres:
+        dir_path = 'data/' + genre + '/'
+        if not os.path.isdir(dir_path):
+            os.makedirs(dir_path)
+        extracted_df = df.query('genre == "%s"' % genre)
+
+        for index, row in extracted_df.iterrows():
+            image_path = './images/' + row['image_file_name']
+            if os.path.exists(image_path):
+                shutil.move(image_path, dir_path + row['image_file_name'])
+
+
 def download_image(url, dst_path):
     try:
         data = urllib.request.urlopen(url).read()
@@ -16,7 +50,6 @@ def download_image(url, dst_path):
             f.write(data)
     except urllib.error.URLError as e:
         print(e)
-
 
 
 def set_driver():
